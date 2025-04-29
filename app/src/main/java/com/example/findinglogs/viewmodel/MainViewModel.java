@@ -4,6 +4,7 @@ package com.example.findinglogs.viewmodel;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -46,6 +47,9 @@ public class MainViewModel extends AndroidViewModel {
 
     private void fetchAllForecasts() {
         if (Logger.ISLOGABLE) Logger.d(TAG, "fetchAllForecasts()");
+
+        handler.removeCallbacks(fetchRunnable);
+
         HashMap<String, String> localizations = mRepository.getLocalizations();
         List<Weather> updatedList = new ArrayList<>();
 
@@ -53,6 +57,8 @@ public class MainViewModel extends AndroidViewModel {
             mRepository.retrieveForecast(latlon, new WeatherCallback() {
                 @Override
                 public void onSuccess(Weather result) {
+                    if (Logger.ISLOGABLE) Logger.d(TAG, "Weather recebido: " + result.toString());
+                    if (Logger.ISLOGABLE) Logger.d(TAG, "Cidade recebida: " +  result.getName());
                     updatedList.add(result);
                     if (updatedList.size() == localizations.size()) {
                         _weatherList.setValue(updatedList);
@@ -76,5 +82,9 @@ public class MainViewModel extends AndroidViewModel {
 
     public void retrieveForecast(String latLon, WeatherCallback callback) {
         mRepository.retrieveForecast(latLon, callback);
+    }
+
+    public void refreshDataNow() {
+        fetchAllForecasts();
     }
 }

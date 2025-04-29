@@ -57,6 +57,10 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
         }
 
         public void holdWeather(Weather weather, Context context) {
+            if (Logger.ISLOGABLE) {
+                Log.d("ADAPTER_ICON", "Ícone recebido no adapter: " + weather.getWeather().get(0).getIcon());
+            }
+
             switch (weather.getWeather().get(0).getIcon()){
                 case "02d":
                     cardView.setCardBackgroundColor(context.getColor(R.color.weather_few_clouds));
@@ -96,7 +100,7 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
             String temp_min_value = "Temp. mín: " +
                     Utils.getCelsiusTemperatureFromKevin(weather.getMain().getTemp_min());
             temp_min.setText(temp_min_value);
-            String pressure_value = "Pressão: " + 1008.2 + "hPa";
+            String pressure_value = "Pressão: " + weather.getMain().getPressure() + " hPa";
             pressure.setText(pressure_value);
             String humidity_value = "Umidade: " + weather.getMain().getHumidity() + "%";
             humidity.setText(humidity_value);
@@ -126,6 +130,12 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     public void updateWeathers(List<Weather> weathersValues) {
         weathers.clear();
         weathers.addAll(weathersValues);
+
+        // Logar a lista para checar duplicados
+        for (Weather weather : weathers) {
+            Log.d("WeatherListAdapter", "Atualizando para cidade: " + weather.getName());
+        }
+
         notifyDataSetChanged();
     }
 }

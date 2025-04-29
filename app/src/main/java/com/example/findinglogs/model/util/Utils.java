@@ -23,6 +23,8 @@ public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
 
     public static Drawable getDrawable(String name, Context context) {
+        Log.d("Utils", "Tentando buscar drawable: " + name);
+
         if (context == null) {
             if (Logger.ISLOGABLE) Logger.e(TAG, "getDrawable: context is null");
             return null;
