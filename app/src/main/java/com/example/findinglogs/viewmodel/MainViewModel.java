@@ -17,7 +17,9 @@ import com.example.findinglogs.model.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainViewModel extends AndroidViewModel {
 
@@ -49,18 +51,26 @@ public class MainViewModel extends AndroidViewModel {
         if (Logger.ISLOGABLE) Logger.d(TAG, "fetchAllForecasts()");
 
         handler.removeCallbacks(fetchRunnable);
-
-        HashMap<String, String> localizations = mRepository.getLocalizations();
+        Set<String> uniqueCoords = new HashSet<>(mRepository.getLocalizations().values());
         List<Weather> updatedList = new ArrayList<>();
 
-        for (String latlon : localizations.values()) {
+        for (String latlon : uniqueCoords) {
             mRepository.retrieveForecast(latlon, new WeatherCallback() {
                 @Override
                 public void onSuccess(Weather result) {
                     if (Logger.ISLOGABLE) Logger.d(TAG, "Weather recebido: " + result.toString());
-                    if (Logger.ISLOGABLE) Logger.d(TAG, "Cidade recebida: " +  result.getName());
-                    updatedList.add(result);
-                    if (updatedList.size() == localizations.size()) {
+                    if (Logger.ISLOGABLE) Logger.d(TAG, "Cidade recebida: " + result.getName());
+
+                    // Verificar se a cidade já está na lista antes de adicionar
+                    boolean alreadyInList = updatedList.stream()
+                            .anyMatch(w -> w.getName().equalsIgnoreCase(result.getName()));
+
+                    if (!alreadyInList) {
+                        updatedList.add(result);
+                    }
+
+                    // Verificar se já finalizou todas as chamadas
+                    if (updatedList.size() == uniqueCoords.size()) {
                         _weatherList.setValue(updatedList);
                         handler.postDelayed(fetchRunnable, FETCH_INTERVAL);
                     }
@@ -68,11 +78,13 @@ public class MainViewModel extends AndroidViewModel {
 
                 @Override
                 public void onFailure(String error) {
+                    if (Logger.ISLOGABLE) Logger.w(TAG, "Erro ao buscar previsão: " + error);
                     handler.postDelayed(fetchRunnable, FETCH_INTERVAL);
                 }
             });
         }
     }
+
 
     @Override
     protected void onCleared() {
