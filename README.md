@@ -22,7 +22,7 @@ The app is functional, but there are still some improvements and bug fixes to be
 - [X] 📊 Fetch and display **pressure** data from the API
 - [X] 🔄 Implement data refresh on **Refresh** button click
 - [X] 🎨 Fix broken **weather icons**
-- [ ] 🧹 Eliminate **duplicate data** issues
+- [X] 🧹 Eliminate **duplicate data** issues
 
 ---
 
